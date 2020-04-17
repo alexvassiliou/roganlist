@@ -22,7 +22,12 @@ func main() {
 
 	for _, g := range guests {
 		fmt.Println(g.Name)
-		fmt.Println(g.Ratio)
 	}
-
 }
+
+// get the names and likes ratio
+// display it on a template
+// order the page from most controversial to least
+// add links to the videos
+
+// html parsing, templates, go routines, http handlers

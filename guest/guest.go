@@ -2,7 +2,10 @@ package guest
 
 import (
 	"io"
+	"log"
+	"net/http"
 	"strings"
+	"text/template"
 
 	"golang.org/x/net/html"
 )
@@ -13,6 +16,18 @@ const ratioOpeningText = "Average likes/dislikes ratio: "
 type Guest struct {
 	Name  string
 	Ratio string
+}
+
+func (g Guest) serveHTTP(w http.ResponseWriter, r *http.Response) {
+	t, err := template.ParseFiles("templates/guests.html")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err2 := t.Execute(w, g)
+	if err2 != nil {
+		log.Fatal(err2)
+	}
 }
 
 // ParseHTML returns a slice of guests from the given html body
@@ -53,9 +68,6 @@ func (g *Guest) getGuestAttributes(z *html.Tokenizer) {
 			if a.Val == "guest-name" {
 				g.Name = getName(z)
 			}
-			if a.Val == "guest-stats" {
-				g.Ratio = getRatio(z)
-			}
 		}
 	}
 }
@@ -66,19 +78,6 @@ func getName(z *html.Tokenizer) string {
 
 	if tt == html.StartTagToken {
 		result = extractText(z)
-	}
-	return result
-}
-
-func getRatio(z *html.Tokenizer) string {
-	var result string
-	tt := z.Next()
-	if tt == html.StartTagToken {
-		token := z.Token()
-		for _, a := range token.Attr {
-			if a.Val == "guest-stats-likes-ratio" {
-			}
-		}
 	}
 	return result
 }
