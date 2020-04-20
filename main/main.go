@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"html"
 	"log"
 	"net/http"
 
@@ -18,11 +19,18 @@ func main() {
 		log.Fatal(err)
 	}
 
-	guests := guest.ParseHTML(resp.Body)
+	var guestHandler guest.Guests
+	guestHandler = guest.ParseHTML(resp.Body)
 
-	for _, g := range guests {
-		fmt.Println(g.Name)
-	}
+	http.HandleFunc("/", homeHandler)
+
+	http.Handle("/guests/", guestHandler)
+
+	log.Fatal(http.ListenAndServe(":8080", nil))
+}
+
+func homeHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Hello, %q", html.EscapeString(r.URL.Path))
 }
 
 // get the names and likes ratio

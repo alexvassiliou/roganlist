@@ -18,7 +18,10 @@ type Guest struct {
 	Ratio string
 }
 
-func (g Guest) serveHTTP(w http.ResponseWriter, r *http.Response) {
+// Guests is a slice of guest
+type Guests []Guest
+
+func (g Guests) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	t, err := template.ParseFiles("templates/guests.html")
 	if err != nil {
 		log.Fatal(err)

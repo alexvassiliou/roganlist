@@ -1,4 +1,7 @@
-<ul>
-    <li>{{.Name}}</li>
-    <li>{{.Ratio}}</li>
-</ul>
+<body>
+    <ul>
+        {{range .}}
+        <li>{{.Name}} - {{.Ratio}}</li>
+        {{end}}
+    </ul>
+</body>
