@@ -2,8 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"html"
 	"log"
 	"net/http"
 
@@ -22,20 +20,13 @@ func main() {
 	var guestHandler guest.Guests
 	guestHandler = guest.ParseHTML(resp.Body)
 
-	http.HandleFunc("/", homeHandler)
+	http.HandleFunc("/", redirect)
 
 	http.Handle("/guests/", guestHandler)
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
-func homeHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello, %q", html.EscapeString(r.URL.Path))
+func redirect(w http.ResponseWriter, r *http.Request) {
+	http.Redirect(w, r, "/guests/", 301)
 }
-
-// get the names and likes ratio
-// display it on a template
-// order the page from most controversial to least
-// add links to the videos
-
-// html parsing, templates, go routines, http handlers

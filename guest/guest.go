@@ -62,14 +62,12 @@ func ParseHTML(r io.Reader) []Guest {
 
 func (g *Guest) getGuestAttributes(z *html.Tokenizer) {
 	tt := z.Next()
-	switch {
-	case tt == html.ErrorToken:
-		return
-	case tt == html.StartTagToken:
+	if tt == html.StartTagToken {
 		token := z.Token()
 		for _, a := range token.Attr {
 			if a.Val == "guest-name" {
 				g.Name = getName(z)
+				g.Ratio = getRatio(z)
 			}
 		}
 	}
@@ -81,6 +79,23 @@ func getName(z *html.Tokenizer) string {
 
 	if tt == html.StartTagToken {
 		result = extractText(z)
+	}
+	return result
+}
+
+func getRatio(z *html.Tokenizer) string {
+	var result string
+	for {
+		tokenType := z.Next()
+		if tokenType == html.StartTagToken {
+			for _, a := range z.Token().Attr {
+				if a.Val == "guest-stats-likes-ratio" {
+					result = extractText(z)
+					return result
+				}
+			}
+		}
+
 	}
 	return result
 }
