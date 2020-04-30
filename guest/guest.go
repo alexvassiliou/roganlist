@@ -1,36 +1,29 @@
 package guest
 
 import (
+	"encoding/json"
+	"fmt"
 	"io"
-	"log"
 	"net/http"
+	"regexp"
+	"strconv"
 	"strings"
-	"text/template"
 
 	"golang.org/x/net/html"
 )
 
-const ratioOpeningText = "Average likes/dislikes ratio: "
-
 // Guest represents a podcast guest
 type Guest struct {
-	Name  string
-	Ratio string
+	Name  string  `json:"Name"`
+	Ratio float64 `json:"Ratio"`
 }
 
 // Guests is a slice of guest
 type Guests []Guest
 
 func (g Guests) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	t, err := template.ParseFiles("templates/guests.html")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err2 := t.Execute(w, g)
-	if err2 != nil {
-		log.Fatal(err2)
-	}
+	fmt.Println("Endpoint hit: All guests endpoint")
+	json.NewEncoder(w).Encode(g)
 }
 
 // ParseHTML returns a slice of guests from the given html body
@@ -83,21 +76,19 @@ func getName(z *html.Tokenizer) string {
 	return result
 }
 
-func getRatio(z *html.Tokenizer) string {
-	var result string
+func getRatio(z *html.Tokenizer) float64 {
+	var result float64
 	for {
 		tokenType := z.Next()
 		if tokenType == html.StartTagToken {
 			for _, a := range z.Token().Attr {
 				if a.Val == "guest-stats-likes-ratio" {
-					result = extractText(z)
+					result = parseRatio(extractText(z))
 					return result
 				}
 			}
 		}
-
 	}
-	return result
 }
 
 func extractText(z *html.Tokenizer) string {
@@ -108,3 +99,25 @@ func extractText(z *html.Tokenizer) string {
 	}
 	return result
 }
+
+func parseRatio(input string) float64 {
+	re := regexp.MustCompile("\\D....")
+	test := re.ReplaceAllString(input, "")
+	i, err := strconv.ParseFloat(test, 64)
+	if err != nil {
+		panic(err)
+	}
+	return i
+}
+
+// func (g Guests) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+// 	t, err := template.ParseFiles("templates/guests.html")
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+
+// 	err2 := t.Execute(w, g)
+// 	if err2 != nil {
+// 		log.Fatal(err2)
+// 	}
+// }
