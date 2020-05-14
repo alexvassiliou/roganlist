@@ -23,6 +23,7 @@ type Guests []Guest
 
 func (g Guests) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Endpoint hit: All guests endpoint")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	json.NewEncoder(w).Encode(g)
 }
 
