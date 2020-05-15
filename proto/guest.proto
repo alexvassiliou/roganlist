@@ -1,8 +1,8 @@
 syntax  = "proto3";
 
-package guest;
+package protoGuest;
 
 message Guest {
     string name = 1;
-    int32 ratio = 2;
+    float ratio = 2;
 }
